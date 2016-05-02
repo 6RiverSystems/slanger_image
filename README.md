@@ -9,3 +9,10 @@ make run_bash # start container and runs bush instead of slanger command
 make push # publish image to GKI private registry
 ```
 
+## Deployment
+
+Write your deployment descriptor and run
+
+```
+kubectl create -f gke.yml
+```
