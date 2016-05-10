@@ -9,8 +9,9 @@ test:
     - make build
 
 deployment:
-  branch: feature/gke
-  commands:
-    - make gcloud_deploy
+  gke:
+    branch: feature/gke
+    commands:
+      - make gcloud_deploy
 
 
