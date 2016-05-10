@@ -2,8 +2,9 @@ FROM ruby:2.3
 MAINTAINER Nick Chistyakov "nick@6river.com"
 ENV RELEASED_AT 2016-04-28
 
-ENV APP_KEY cf256b0f27ce65f518c1
-ENV APP_SECRET 49c7e5564de31d764400
+ENV APP_KEY key
+ENV APP_SECRET secret
+ENV SLANGER_ARGS ""
 
 RUN apt-get update
 RUN gem install slanger
@@ -22,4 +23,4 @@ RUN gem install slanger
 # -v or --[no-]verbose This makes Slanger run verbosely, meaning WebSocket frames will be echoed to STDOUT. Useful for debugging
 # --pid_file  The path to a file you want slanger to write it's PID to. Optional.
 
-ENTRYPOINT slanger --app_key=${APP_KEY} --secret=${APP_SECRET}
+CMD slanger --app_key=${APP_KEY} --secret=${APP_SECRET} ${SLANGER_ARGS}
