@@ -62,5 +62,5 @@ gcloud_config: check_gcloud_env
 	@gcloud config set project $(GCLOUD_PROJECT)
 	@gcloud config set compute/zone $(GCLOUD_COMPUTE_ZONE)
 
-gcloud_deploy: build gcloud_config gcloud_push
+gcloud_deploy: gcloud_config gcloud_push
 
