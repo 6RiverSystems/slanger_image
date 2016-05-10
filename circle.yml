@@ -10,7 +10,7 @@ test:
 
 deployment:
   gke:
-    branch: feature/gke
+    branch: master
     commands:
       - make gcloud_deploy
 
