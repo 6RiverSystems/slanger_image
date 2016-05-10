@@ -1,54 +1,66 @@
-# Docker Image Name
+# Docker Image Name (is taken from package.json file)
 NAME = slanger
-# Image Version
-VERSION = 0.0.1
+
+# Image Version (is taken from package.json file)
+VERSION = 0.0.9
 
 # GCE Project ID
-PROJECT_ID = plasma-column-128721
+GCLOUD_PROJECT ?= plasma-column-128721
 
-# Google Conttainer Registry
-GCR_NAME = gcr.io/$(PROJECT_ID)/$(NAME):$(VERSION)
+# Google Conttainer Registry name
+GCR_NAME = gcr.io/$(GCLOUD_PROJECT)/$(NAME):$(VERSION)
 
-# Application environment
-APP_KEY = cf256b0f27ce65f518c1
-APP_SECRET = 49c7e5564de31d764400
-
-.PHONY: all check run run_bash tag clean build_image build push
+.PHONY: all check_exists check_ssh_key run run_bash gcloud_tag clean build gcloud_push check_gcloud_env gcloud_config gcloud_deploy
 
 all: build
 
 # Perform a check if Docker image exists
-check:
+check_exists:
 	@if ! docker images $(NAME) | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME) version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 
-# Run slanger
-run: check
+# Run image
+run: check_exists
 	docker run --rm -it \
-		-e APP_KEY=$(APP_KEY) -e APP_SECRET=$(APP_SECRET) \
-		-p 8080:8080 -p 4567:4567 \
+		--name $(NAME) \
 		$(NAME):$(VERSION)
+
+stop:
+	docker stop $(NAME)
 
 # Used for quality diagnostics
 # Opens bash session
-run_bash: check
+run_bash: check_exists
 	docker run --rm -it --entrypoint=/bin/bash $(NAME):$(VERSION)
 
-# Tag current version as latest
-tag:
-	docker tag $(NAME):$(VERSION) $(GCR_NAME)
-
 # Remove Docker image
-clean: check
-	docker rmi $(NAME):$(VERSION)
-	docker rmi $(GCR_NAME)
+clean:
+	@if docker images $(GCR_NAME) | awk '{ print $$2 }' | grep -q -F $(VERSION); then docker rmi $(GCR_NAME); fi
+	@if docker images $(NAME) | awk '{ print $$2 }' | grep -q -F $(VERSION); then docker rmi $(NAME):$(VERSION); fi
 
 # Build Docker image
-build_image:
-	docker build -t $(NAME):$(VERSION) .
+build:
+	@docker build -t $(NAME):$(VERSION) .
 
-build: build_image tag
+# Tag current version with gcloud name
+gcloud_tag:
+	docker tag $(NAME):$(VERSION) $(GCR_NAME)
 
-# Publish image
-push: check tag
+# Publish image to GKE registry
+gcloud_push: check_exists gcloud_tag
 	gcloud docker push $(GCR_NAME)
+
+check_gcloud_env:
+	@if [ -z "$(CLIENT_SECRET)" ]; then echo "CLIENT_SECRET environment variable is not set"; false; fi
+	@if [ -z "$(GCLOUD_PROJECT)" ]; then echo "GCLOUD_PROJECT environment variable is not set"; false; fi
+	@if [ -z "$(GCLOUD_COMPUTE_ZONE)" ]; then echo "GCLOUD_COMPUTE_ZONE environment variable is not set"; false; fi
+
+gcloud_config: check_gcloud_env
+	@echo $(CLIENT_SECRET) | base64 --decode > ${HOME}/client-secret.json
+	@sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
+	@sudo chmod 757 /home/ubuntu/.config/gcloud/logs -R
+	@gcloud auth activate-service-account --key-file ${HOME}/client-secret.json
+	@gcloud config set project $(GCLOUD_PROJECT)
+	@gcloud config set compute/zone $(GCLOUD_COMPUTE_ZONE)
+
+gcloud_deploy: build gcloud_config gcloud_push
 
