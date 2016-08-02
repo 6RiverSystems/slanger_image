@@ -2,7 +2,7 @@
 NAME = slanger
 
 # Image Version (is taken from package.json file)
-VERSION = $(shell git describe --long --tags --dirty --always)
+VERSION = $(shell cd ./slanger; git describe --long --tags --dirty --always)
 
 # GCE Project ID
 GCLOUD_PROJECT ?= plasma-column-128721
@@ -23,8 +23,9 @@ check_exists:
 
 # Run image
 run: check_exists
+	
 	docker run --rm -it \
-		--name $(NAME) \
+		--name $(NAME)-$(shell date +%Y%m%d) \
 		$(NAME):$(VERSION)
 
 stop:

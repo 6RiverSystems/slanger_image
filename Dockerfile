@@ -1,6 +1,6 @@
 FROM ruby:2.3
 MAINTAINER Nick Chistyakov "nick@6river.com"
-ENV RELEASED_AT 2016-08-02
+ENV RELEASED_AT 2016-08-02_1434
 
 ENV APP_KEY key
 ENV APP_SECRET secret
@@ -12,13 +12,9 @@ RUN gem install bundler
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-RUN git clone -b presence_webhooks https://github.com/6RiverSystems/slanger.git /usr/src/app
+COPY ./slanger /usr/src/app
 
 RUN bundler install
-
-RUN rake build
-RUN find ./pkg -name *.gem -exec gem install {} \;
-
 
 # Slanger command line params
 # -k or --app_key This is the Pusher app key you want to use. This is a required argument on command line or in optional config file
@@ -34,4 +30,4 @@ RUN find ./pkg -name *.gem -exec gem install {} \;
 # -v or --[no-]verbose This makes Slanger run verbosely, meaning WebSocket frames will be echoed to STDOUT. Useful for debugging
 # --pid_file  The path to a file you want slanger to write it's PID to. Optional.
 
-CMD slanger --app_key=${APP_KEY} --secret=${APP_SECRET} ${SLANGER_ARGS}
+CMD bin/slanger --app_key=${APP_KEY} --secret=${APP_SECRET} ${SLANGER_ARGS}
