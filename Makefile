@@ -68,12 +68,13 @@ gcloud_config: check_gcloud_env
 gcloud_deploy: gcloud_config gcloud_push
 
 dockerhub_tag:
-	docker tag $(NAME):$(VERSION) $(DOCKERHUB_NAME)
+	@docker tag $(NAME):$(VERSION) $(DOCKERHUB_NAME)
 
 check_dockerhub_env:
+	@if [ -z "$(DOCKER_EMAIL)" ]; then echo "DOCKER_EMAIL environment variable is not set"; false; fi
 	@if [ -z "$(DOCKER_USER)" ]; then echo "DOCKER_USER environment variable is not set"; false; fi
 	@if [ -z "$(DOCKER_PASS)" ]; then echo "DOCKER_PASS environment variable is not set"; false; fi
 
 dockerhub_push: check_exists check_dockerhub_env dockerhub_tag
-	docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
-	docker push $(DOCKERHUB_NAME)
+	@docker login -e $(DOCKER_EMAIL) -u $(DOCKER_USER) -p $(DOCKER_PASS)
+	@docker push $(DOCKERHUB_NAME)
