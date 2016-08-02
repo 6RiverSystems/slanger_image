@@ -4,6 +4,12 @@ machine:
   services:
     - docker
 
+checkout:
+  post:
+    - git submodule sync
+    - git submodule update --init
+    - pushd . && cd slanger && git checkout presence_webhooks && popd
+      
 test:
   post:
     - make build
