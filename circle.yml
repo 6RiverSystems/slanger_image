@@ -12,6 +12,7 @@ deployment:
   gke:
     branch: master
     commands:
+      - make dockerhub_push
       - make gcloud_deploy
 
 
