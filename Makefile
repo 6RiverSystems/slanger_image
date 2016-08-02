@@ -10,6 +10,9 @@ GCLOUD_PROJECT ?= plasma-column-128721
 # Google Conttainer Registry name
 GCR_NAME = gcr.io/$(GCLOUD_PROJECT)/$(NAME):$(VERSION)
 
+# Dockerhub Image Name 
+DOCKERHUB_NAME = 6river/$(NAME):$(VERSION)
+
 .PHONY: all check_exists check_ssh_key run run_bash gcloud_tag clean build gcloud_push check_gcloud_env gcloud_config gcloud_deploy
 
 all: build
@@ -64,3 +67,13 @@ gcloud_config: check_gcloud_env
 
 gcloud_deploy: gcloud_config gcloud_push
 
+dockerhub_tag:
+	docker tag $(NAME):$(VERSION) $(DOCKERHUB_NAME)
+
+check_dockerhub_env:
+	@if [ -z "$(DOCKER_USER)" ]; then echo "DOCKER_USER environment variable is not set"; false; fi
+	@if [ -z "$(DOCKER_PASS)" ]; then echo "DOCKER_PASS environment variable is not set"; false; fi
+
+dockerhub_push: check_exists check_dockerhub_env dockerhub_tag
+	docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
+	docker push $(DOCKERHUB_NAME)
