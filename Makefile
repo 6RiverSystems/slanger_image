@@ -2,7 +2,7 @@
 NAME = slanger
 
 # Image Version (is taken from package.json file)
-VERSION = 0.0.9
+VERSION = $(shell git describe --long --tags --dirty --always)
 
 # GCE Project ID
 GCLOUD_PROJECT ?= plasma-column-128721
