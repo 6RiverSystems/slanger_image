@@ -1,6 +1,6 @@
 FROM ruby:2.3
 MAINTAINER Nick Chistyakov "nick@6river.com"
-ENV RELEASED_AT 2016-08-02_1434
+ENV RELEASED_AT 2016-08-02_1601
 
 ENV APP_KEY key
 ENV APP_SECRET secret
@@ -30,4 +30,4 @@ RUN bundler install
 # -v or --[no-]verbose This makes Slanger run verbosely, meaning WebSocket frames will be echoed to STDOUT. Useful for debugging
 # --pid_file  The path to a file you want slanger to write it's PID to. Optional.
 
-CMD bin/slanger --app_key=${APP_KEY} --secret=${APP_SECRET} ${SLANGER_ARGS}
+CMD ["bin/slanger", "--app_key=${APP_KEY}", "--secret=${APP_SECRET}", "${SLANGER_ARGS}"]
