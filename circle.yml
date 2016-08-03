@@ -8,7 +8,7 @@ checkout:
   post:
     - git submodule sync
     - git submodule update --init
-    - pushd . && cd slanger && git checkout presence_webhooks && popd
+    - pushd . && cd slanger && git fetch && git checkout presence_webhooks && popd
       
 test:
   post:
