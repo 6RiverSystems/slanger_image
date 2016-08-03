@@ -23,13 +23,10 @@ check_exists:
 
 # Run image
 run: check_exists
-	
 	docker run --rm -it \
+		-e SLANGER_ARGS=' -v --webhook_url="http://0.0.0.0:3000/v1/clientEvent" ' \
 		--name $(NAME)-$(shell date +%Y%m%d) \
 		$(NAME):$(VERSION)
-
-stop:
-	docker stop $(NAME)
 
 # Used for quality diagnostics
 # Opens bash session
@@ -43,6 +40,7 @@ clean:
 
 # Build Docker image
 build:
+	@echo "Making Slanger Image: $(NAME):$(VERSION)"
 	@docker build -t $(NAME):$(VERSION) .
 
 # Tag current version with gcloud name
