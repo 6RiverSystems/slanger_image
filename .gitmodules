@@ -1,3 +1,4 @@
 [submodule "slanger"]
 	path = slanger
 	url = https://github.com/6RiverSystems/slanger
+	branch = presence_webhooks
